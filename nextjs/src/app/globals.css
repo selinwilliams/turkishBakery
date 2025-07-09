@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+/* :root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+} */
+
+/* Bakery-themed design tokens */
+@theme {
+  /* Colors inspired by bakery/cafe aesthetics */
+  --color-crust: #8B4513;          /* Saddle brown - primary */
+  --color-wheat: #F5DEB3;          /* Wheat - secondary */
+  --color-butter: #FFFACD;         /* Lemon chiffon - accent */
+  --color-cream: #FAF0E6;          /* Linen - background */
+  --color-coffee: #3E2723;         /* Dark brown - text */
+  --color-sugar: #FFFFFF;          /* White */
+  --color-cocoa: #D2691E;          /* Chocolate */
+  
+  /* Semantic colors */
+  --color-primary: var(--color-crust);
+  --color-secondary: var(--color-wheat);
+  --color-accent: var(--color-cocoa);
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-coffee);
+  
+  /* Typography */
+  --font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-family-serif: 'Playfair Display', Georgia, serif;
+  --font-family-mono: 'Fira Code', monospace;
+  
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --spacing-2xl: 4rem;
+  --spacing-3xl: 6rem;
+  
+  /* Layout */
+  --max-width-xs: 20rem;
+  --max-width-sm: 24rem;
+  --max-width-md: 28rem;
+  --max-width-lg: 32rem;
+  --max-width-xl: 36rem;
+  --max-width-2xl: 42rem;
+  --max-width-3xl: 48rem;
+  --max-width-4xl: 56rem;
+  --max-width-5xl: 64rem;
+  --max-width-6xl: 72rem;
+  --max-width-7xl: 80rem;
+  
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: var(--font-family-sans);
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-serif);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .container {
+    max-width: var(--max-width-7xl);
+    margin-inline: auto;
+    padding-inline: var(--spacing-md);
+  }
+  
+  .section-padding {
+    padding-block: var(--spacing-3xl);
+  }
+}

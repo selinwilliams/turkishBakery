@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  /* Modern minimalist colors - using standard Tailwind naming */
+  --color-stone-50: #fafaf9;       /* lightest background */
+  --color-stone-100: #f5f5f4;      /* main background */
+  --color-stone-200: #e7e5e4;      /* borders, subtle elements */
+  --color-stone-300: #d6d3d1;      /* muted elements */
+  --color-stone-800: #292524;      /* main text */
+  --color-stone-900: #1c1917;      /* darkest text */
+  
+  --color-amber-100: #fef3c7;      /* light accent */
+  --color-amber-200: #fde68a;      /* medium accent */
+  --color-amber-600: #d97706;      /* main accent */
+  --color-amber-700: #b45309;      /* dark accent */
+  
+  --color-emerald-100: #d1fae5;    /* light green */
+  --color-emerald-600: #059669;    /* main green */
+  --color-emerald-700: #047857;    /* dark green */
+}
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #fafaf9;
+    color: #292524;
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 500;
+    color: #1c1917;
+  }
+}
+
+@layer utilities {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .section-padding {
+    padding: 4rem 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0;
+}

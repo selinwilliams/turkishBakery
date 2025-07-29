@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  bakery-website:
+    build: ./nextjs
+    container_name: bakery-website
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID}
+      - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET}
+    networks:
+      - bakery-network
+
+networks:
+  bakery-network:
+    driver: bridge

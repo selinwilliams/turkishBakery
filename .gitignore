@@ -7,4 +7,4 @@ nextjs/public/images/*.png
 .env.local
 .env.production
 .env.development
-.env.test
+.env.testnextjs/public/images/white-cake.jpg

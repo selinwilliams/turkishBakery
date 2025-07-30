@@ -2,7 +2,7 @@
 # Large images
 nextjs/public/images/*.jpg
 nextjs/public/images/*.png
-nextjs/public/images/*.jpeg
+
 .env
 .env.local
 .env.production

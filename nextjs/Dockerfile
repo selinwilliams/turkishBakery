@@ -6,7 +6,7 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
+# Copy package files (they're in current directory since we're building from nextjs/)
 COPY package.json package-lock.json* ./
 RUN npm ci --only=production
 
@@ -14,6 +14,7 @@ RUN npm ci --only=production
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+# Copy all files from current directory (nextjs/)
 COPY . .
 
 # Build the app

@@ -6,14 +6,17 @@ services:
     container_name: bakery-website
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3005:3000"
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID}
       - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET}
     networks:
+      - shared_portainer_network
       - bakery-network
 
 networks:
+  shared_portainer_network:
+    external: true
   bakery-network:
     driver: bridge

@@ -1,7 +1,5 @@
 
 # Large images
-nextjs/public/images/*.jpg
-nextjs/public/images/*.png
 
 .env
 .env.local

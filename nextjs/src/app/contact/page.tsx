@@ -27,7 +27,7 @@ Cake Type: ${formData.cakeType}
 Servings: ${formData.servings}
 Message: ${formData.message}`
 
-    const whatsappUrl = `https://wa.me/1234567890?text=${encodeURIComponent(message)}`
+    const whatsappUrl = `https://wa.me/17138203443?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
   }
 
@@ -81,7 +81,7 @@ Message: ${formData.message}`
                 </div>
                 <div>
                   <h3 className="text-xl font-serif font-light text-stone-900 mb-1">Phone</h3>
-                  <a href="tel:+1234567890" className="text-lg text-stone-600 hover:text-amber-600 transition-colors">
+                  <a href="tel:+17138203443" className="text-lg text-stone-600 hover:text-amber-600 transition-colors">
                     +1 (713) 820-3443
                   </a>
                 </div>

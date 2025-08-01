@@ -99,7 +99,7 @@ export default async function HomePage() {
         className="inline-flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-full font-medium hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105"
       >
         <span className="text-2xl">📷</span>
-        <span>@sweetcreations</span>
+        <span>@hobbyandgift</span>
         <span className="text-sm bg-white/20 px-3 py-1 rounded-full">Follow</span>
       </a>
     </div>

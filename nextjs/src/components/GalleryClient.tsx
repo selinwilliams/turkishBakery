@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import { Cake } from '@/types/product'
 import ProductCard from './ProductCard'
 
@@ -18,16 +17,8 @@ const categories = [
 ]
 
 export default function GalleryClient({ products }: GalleryClientProps) {
-  const searchParams = useSearchParams()
   const [selectedCategory, setSelectedCategory] = useState('all')
 
-  // Get category from URL params
-  useEffect(() => {
-    const categoryParam = searchParams.get('category')
-    if (categoryParam) {
-      setSelectedCategory(categoryParam)
-    }
-  }, [searchParams])
 
   // Filter products based on selected category
   const filteredProducts = selectedCategory === 'all' 

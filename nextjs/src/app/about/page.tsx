@@ -43,7 +43,7 @@ export default function AboutPage() {
           {/* Story */}
           <div>
             <h2 className="text-4xl font-serif font-light mb-8 text-stone-900">
-              Hi, I'm [Your Friend's Name]
+              Hi, I'm Gulsah
             </h2>
 
             <div className="space-y-6 text-stone-600 leading-relaxed text-lg">

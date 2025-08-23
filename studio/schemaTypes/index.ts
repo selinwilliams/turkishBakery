@@ -1,2 +1,5 @@
 import { product } from "./productTypes"
-export const schemaTypes = [product]
+import { cateringCategory, cateringInfo } from "./cateringTypes"
+import { instagramShowcase } from "./instagramShowcase"
+
+export const schemaTypes = [product, cateringCategory, cateringInfo, instagramShowcase]

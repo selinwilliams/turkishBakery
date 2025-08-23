@@ -2,28 +2,36 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 export default function Navigation() {
   const pathname = usePathname()
   const [isProductsOpen, setIsProductsOpen] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const productCategories = [
-    { href: '/gallery', label: 'All Cakes' },
-    { href: '/gallery?category=wedding', label: 'Wedding Cakes' },
-    { href: '/gallery?category=birthday', label: 'Birthday Cakes' },
-    { href: '/gallery?category=engagement', label: 'Engagement Cakes' },
-    { href: '/gallery?category=catering', label: 'Catering' },
-  ]
-  const mainNavItems = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
+    { href: '/gallery', label: 'All Cakes', icon: '🎂' },
+    { href: '/gallery?category=wedding', label: 'Wedding Cakes', icon: '💒' },
+    { href: '/gallery?category=birthday', label: 'Birthday Cakes', icon: '🎉' },
+    { href: '/gallery?category=engagement', label: 'Engagement Cakes', icon: '💍' },
+    { href: '/products/catering', label: 'Catering Services', icon: '🍽️' },
   ]
 
-   const handleLinkClick = () => {
-    setIsMobileMenuOpen(false)
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProductsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Close dropdown when clicking a link
+  const handleLinkClick = () => {
+    setIsProductsOpen(false)
   }
 
   return (
@@ -31,11 +39,7 @@ export default function Navigation() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
-          <Link 
-            href="/" 
-            className="text-2xl font-serif text-stone-900"
-            onClick={handleLinkClick}
-          >
+          <Link href="/" className="text-2xl font-serif text-stone-900">
             Sweet Creations
           </Link>
 
@@ -50,33 +54,46 @@ export default function Navigation() {
               Home
             </Link>
 
-            {/* Products Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setIsProductsOpen(true)}
-              onMouseLeave={() => setIsProductsOpen(false)}
-            >
+            {/* Products Dropdown - Click-based */}
+            <div className="relative" ref={dropdownRef}>
               <button
+                onClick={() => setIsProductsOpen(!isProductsOpen)}
                 className={`font-medium transition-colors hover:text-amber-600 flex items-center ${
-                  pathname.startsWith('/gallery') ? 'text-amber-600 border-b-2 border-amber-600' : 'text-stone-700'
+                  pathname.startsWith('/gallery') || pathname.startsWith('/products') 
+                    ? 'text-amber-600 border-b-2 border-amber-600' 
+                    : 'text-stone-700'
                 }`}
               >
                 Our Cakes
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg 
+                  className={`w-4 h-4 ml-1 transition-transform duration-200 ${
+                    isProductsOpen ? 'rotate-180' : ''
+                  }`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {/* Dropdown Menu */}
               {isProductsOpen && (
-                <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-stone-200 rounded-lg shadow-lg py-2">
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-stone-200 rounded-lg shadow-lg py-3 z-50">
                   {productCategories.map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
-                      className="block px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-amber-600 transition-colors"
+                      onClick={handleLinkClick}
+                      className="flex items-center px-6 py-3 text-stone-700 hover:bg-stone-50 hover:text-amber-600 transition-colors"
                     >
-                      {item.label}
+                      <span className="text-xl mr-4">{item.icon}</span>
+                      <span className="font-medium">{item.label}</span>
+                      {item.href === '/products/catering' && (
+                        <span className="ml-auto text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full">
+                          Services
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -103,7 +120,7 @@ export default function Navigation() {
             
             {/* Call to Action */}
             <a
-              href="tel:+17138203443"
+              href="tel:+1234567890"
               className="bg-stone-900 text-white px-6 py-2 rounded-full font-medium hover:bg-amber-600 transition-colors"
             >
               📞 Order Now
@@ -111,77 +128,12 @@ export default function Navigation() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-stone-700 p-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-          >
-            {isMobileMenuOpen ? (
-              // Close icon
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              // Hamburger icon
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
+          <button className="md:hidden text-stone-700">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
         </div>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-stone-200 py-4">
-            {/* Main Navigation Items */}
-            <div className="space-y-2">
-              {mainNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={handleLinkClick}
-                  className={`block px-4 py-3 text-lg font-medium transition-colors ${
-                    pathname === item.href 
-                      ? 'text-amber-600 bg-amber-50' 
-                      : 'text-stone-700 hover:text-amber-600 hover:bg-stone-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              {/* Our Cakes Section */}
-              <div className="px-4 py-2">
-                <div className="text-lg font-medium text-stone-900 mb-2">Our Cakes</div>
-                <div className="space-y-1 ml-4">
-                  {productCategories.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={handleLinkClick}
-                      className={`block py-2 text-stone-600 hover:text-amber-600 transition-colors ${
-                        pathname === item.href ? 'text-amber-600' : ''
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Call to Action */}
-              <div className="px-4 pt-4 border-t border-stone-200 mt-4">
-                <a
-                  href="tel:+17138203443"
-                  className="block w-full bg-stone-900 text-white text-center px-6 py-3 rounded-full font-medium hover:bg-amber-600 transition-colors"
-                  onClick={handleLinkClick}
-                >
-                  📞 Order Now
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   )

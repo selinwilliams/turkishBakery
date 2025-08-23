@@ -6,6 +6,7 @@ import Image from "next/image";
 import InstagramFeed from "@/components/InstagramFeed";
 
 async function getProducts(): Promise<Cake[]> {
+  try {
   const query = `*[_type == "cake" || _type == "product"] {
     _id,
     _type,
@@ -19,6 +20,10 @@ async function getProducts(): Promise<Cake[]> {
   }`;
 
   return await client.fetch(query);
+} catch (error) {
+  console.error('Failed to fetch products:', error);
+  return [];
+  }
 }
 
 export default async function HomePage() {
@@ -46,7 +51,7 @@ export default async function HomePage() {
             Beautiful Custom Cakes
           </h1>
           <p className="text-xl md:text-2xl text-stone-700 mb-10 max-w-3xl mx-auto leading-relaxed">
-            Handcrafted with love for your special occasions
+            Handcrafted custom cakes for your special occasions. Professional bakery services with beautiful, delicious creations.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link 

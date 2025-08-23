@@ -35,7 +35,7 @@ export default async function GalleryPage() {
         />
 
         {/* Stronger overlay for readability */}
-        <div className="absolute inset-0 bg-white/60"></div>
+        <div className="absolute inset-0 bg-white/30"></div>
 
         <div className="container text-center relative z-10">
           <h1 className="text-5xl font-serif font-light mb-6 text-stone-900">

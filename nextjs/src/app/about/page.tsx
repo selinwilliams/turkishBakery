@@ -15,7 +15,7 @@ export default function AboutPage() {
           priority
         />
 
-        <div className="absolute inset-0 bg-white/60"></div>
+        <div className="absolute inset-0 bg-white/30"></div>
 
         <div className="container text-center relative z-10">
           <h1 className="text-5xl font-serif font-light mb-6 text-stone-900">
@@ -33,7 +33,7 @@ export default function AboutPage() {
           {/* Image */}
           <div className="relative h-96 lg:h-[500px] rounded-2xl overflow-hidden shadow-lg">
             <Image
-              src="/images/baker-photo.jpg" // You'll need to add this
+              src="/images/hands.jpg" //need to add this
               alt="Baker in kitchen"
               fill
               className="object-cover"

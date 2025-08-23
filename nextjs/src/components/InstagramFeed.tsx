@@ -21,24 +21,29 @@ export default function InstagramFeed({ username, limit = 8 }: InstagramFeedProp
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // For now, we'll use placeholder data
-  // Later we'll replace this with real Instagram API calls
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      // Placeholder posts - replace with real API call later
-      const placeholderPosts = Array.from({ length: limit }, (_, i) => ({
-        id: `post-${i}`,
-        media_url: `/images/placeholder-instagram-${(i % 4) + 1}.jpg`,
-        permalink: `https://instagram.com/p/placeholder${i}`,
-        caption: `Beautiful cake creation #${i + 1}`,
-        media_type: 'IMAGE'
-      }))
-      
-      setPosts(placeholderPosts)
-      setLoading(false)
-    }, 1000)
-  }, [limit])
+    async function fetchInstagramPosts() {
+      try {
+        setLoading(true)
+        const response = await fetch(`/api/instagram?username=${username}`)
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch posts')
+        }
+        
+        const data = await response.json()
+        setPosts(data.posts.slice(0, limit))
+        
+      } catch (err) {
+        setError('Unable to load Instagram posts')
+        console.error('Instagram fetch error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchInstagramPosts()
+  }, [username, limit])
 
   if (loading) {
     return (
@@ -56,7 +61,10 @@ export default function InstagramFeed({ username, limit = 8 }: InstagramFeedProp
   if (error) {
     return (
       <div className="text-center py-8">
-        <p className="text-stone-500">Unable to load Instagram posts</p>
+        <p className="text-stone-500">{error}</p>
+        <p className="text-sm text-stone-400 mt-2">
+          Follow us on Instagram @{username}
+        </p>
       </div>
     )
   }
@@ -69,18 +77,22 @@ export default function InstagramFeed({ username, limit = 8 }: InstagramFeedProp
           href={post.permalink}
           target="_blank"
           rel="noopener noreferrer"
-          className="group aspect-square relative overflow-hidden rounded-lg bg-stone-200"
+          className="group aspect-square relative overflow-hidden rounded-lg bg-stone-200 hover:scale-105 transition-transform duration-300"
         >
-          {/* Placeholder for now - will be real Instagram images later */}
-          <div className="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
-            <span className="text-white text-4xl group-hover:scale-110 transition-transform">
-              📷
-            </span>
-          </div>
+          <Image
+            src={post.media_url}
+            alt={post.caption || 'Instagram post'}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 50vw, 25vw"
+          />
           
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <span className="text-white text-sm font-medium">View on Instagram</span>
+            <div className="text-center text-white">
+              <span className="text-2xl mb-2 block">📷</span>
+              <span className="text-sm font-medium">View on Instagram</span>
+            </div>
           </div>
         </a>
       ))}

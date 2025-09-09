@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { Cake } from '@/types/product'
+import { useEffect, useState } from 'react'
+import { Product } from '@/types/product'
 import ProductCard from './ProductCard'
 
 interface GalleryClientProps {
-  products: Cake[]
+  products: Product[]
+  initialCategory?: string
 }
 
 const categories = [
@@ -16,14 +17,40 @@ const categories = [
   { value: 'catering', label: 'Catering', icon: '🍽️' },
 ]
 
-export default function GalleryClient({ products }: GalleryClientProps) {
-  const [selectedCategory, setSelectedCategory] = useState('all')
+export default function GalleryClient({ products, initialCategory = 'all' }: GalleryClientProps) {
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
+
+  // Keep selected category in sync when URL query changes
+  useEffect(() => {
+    setSelectedCategory(initialCategory)
+  }, [initialCategory])
+
+  const baseCategory = (val?: string) => {
+    const v = (val || '').toLowerCase()
+    if (v.includes('wedding')) return 'wedding'
+    if (v.includes('birthday')) return 'birthday'
+    if (v.includes('engagement')) return 'engagement'
+    if (v.includes('catering')) return 'catering'
+    if (v.includes('pastries')) return 'pastries'
+    if (v.includes('cookies')) return 'cookies'
+    return v.replace(/\s+/g, '-').replace(/-+$/, '')
+  }
 
 
   // Filter products based on selected category
-  const filteredProducts = selectedCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory)
+  const filteredProducts = selectedCategory === 'all'
+    ? products
+    : products.filter(product => {
+        const cat = baseCategory(product.category)
+        if (selectedCategory === 'catering') {
+          return cat === 'catering' || product.productType === 'catering'
+        }
+        // For wedding/birthday/engagement, accept loose matches in category
+        if (['wedding', 'birthday', 'engagement'].includes(selectedCategory)) {
+          return cat === selectedCategory
+        }
+        return cat === selectedCategory
+      })
 
   return (
     <div>

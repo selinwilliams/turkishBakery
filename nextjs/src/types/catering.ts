@@ -50,6 +50,19 @@ export interface CateringInfo {
       width: number
     }
   }
+  highlightTitle?: string
+  highlightSubtitle?: string
+  highlightImages?: {
+    asset: {
+      _ref: string
+    }
+    hotspot?: {
+      x: number
+      y: number
+      height: number
+      width: number
+    }
+  }[]
   minimumOrder?: string
   advanceNotice?: string
   contactMessage?: string

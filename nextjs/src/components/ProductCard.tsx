@@ -9,7 +9,11 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const imageUrl = product.image 
     ? urlForImage(product.image).width(400).height(300).url()
-    : '/placeholder-cake.jpg'
+    : '/images/white-cake.jpg'
+
+  const formattedPrice = typeof product.price === 'number'
+    ? `$${product.price}`
+    : (product.price || '')
 
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 border border-stone-200">
@@ -31,9 +35,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-6">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-serif text-stone-900">{product.title}</h3>
-          <span className="text-lg font-semibold text-amber-600">
-            ${product.price}
-          </span>
+          {formattedPrice && (
+            <span className="text-lg font-semibold text-amber-600">
+              {formattedPrice}
+            </span>
+          )}
         </div>
         
         <div className="flex gap-2 mb-3">

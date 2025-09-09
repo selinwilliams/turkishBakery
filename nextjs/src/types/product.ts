@@ -1,7 +1,7 @@
 export interface Product {
   _id: string
   title: string
-  price: number
+  price?: number | string
   description?: string
   productType: 'cakes' | 'pastries' | 'cookies' | 'catering'
   category?: string

@@ -1,10 +1,12 @@
 import { client } from "@/sanity/client";
-import { Cake } from "@/types/product";
+import { Product } from "@/types/product";
 import GalleryClient from "@/components/GalleryClient";
 import Image from "next/image";
 
-async function getAllProducts(): Promise<Cake[]> {
-  const query = `*[_type == "cake" || _type == "product"] | order(_createdAt desc) {
+export const revalidate = 0;
+
+async function getAllProducts(): Promise<Product[]> {
+  const productsQuery = `*[_type == "product"] | order(_createdAt desc) {
     _id,
     _type,
     title,
@@ -16,11 +18,45 @@ async function getAllProducts(): Promise<Cake[]> {
     featured
   }`;
 
-  return await client.fetch(query);
+
+  // Flatten catering items to look like products for the gallery
+  const cateringItemsQuery = `*[_type == "cateringCategory"]{
+    _id,
+    items[]{
+      _key,
+      name,
+      description,
+      // prefer basePrice; sometimes price may be string in older content
+      "price": coalesce(basePrice, price),
+      image
+    }
+  }`;
+
+  const [products, cateringCats] = await Promise.all([
+    client.fetch(productsQuery),
+    client.fetch(cateringItemsQuery),
+  ]);
+
+  const cateringMapped: Product[] = (cateringCats || []).flatMap((cat: any) =>
+    (cat.items || []).map((item: any, idx: number) => ({
+      _id: `catering:${cat._id}:${item._key || idx}`,
+      title: item.name,
+      price: item.price,
+      description: item.description,
+      productType: 'catering',
+      category: 'catering',
+      image: item.image,
+      featured: false,
+    }))
+  );
+
+  // Merge: products first, then catering items
+  return [...products, ...cateringMapped] as Product[];
 }
 
-export default async function GalleryPage() {
+export default async function GalleryPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   const products = await getAllProducts();
+  const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : 'all';
 
   return (
     <main>
@@ -50,7 +86,8 @@ export default async function GalleryPage() {
 
       {/* Gallery Content */}
       <section className="container py-16">
-        <GalleryClient products={products} />
+        {/* Remount client component when category changes to avoid stale state */}
+        <GalleryClient key={initialCategory} products={products} initialCategory={initialCategory} />
       </section>
     </main>
   );

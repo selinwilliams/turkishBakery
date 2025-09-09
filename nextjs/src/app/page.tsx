@@ -5,9 +5,11 @@ import ProductCard from "@/components/ProductCard";
 import Image from "next/image";
 import InstagramFeed from "@/components/InstagramFeed";
 
+export const revalidate = 0;
+
 async function getProducts(): Promise<Cake[]> {
   try {
-  const query = `*[_type == "cake" || _type == "product"] {
+  const query = `*[_type == "product"] {
     _id,
     _type,
     title,

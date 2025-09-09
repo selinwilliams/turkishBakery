@@ -5,6 +5,9 @@ import { client } from "@/sanity/client";
 import { urlForImage } from "@/sanity/image";
 import { CateringCategory, CateringInfo } from "@/types/catering";
 
+// Ensure fresh data on each request (no caching)
+export const revalidate = 0;
+
 async function getCateringData() {
   const categoriesQuery = `*[_type == "cateringCategory"] | order(order asc) {
     _id,
@@ -15,7 +18,8 @@ async function getCateringData() {
     items[] {
       name,
       description,
-      price,
+      // Project basePrice to price for UI compatibility
+      "price": coalesce(price, string(basePrice)),
       image
     },
     order
@@ -26,6 +30,9 @@ async function getCateringData() {
     title,
     subtitle,
     heroImage,
+    highlightTitle,
+    highlightSubtitle,
+    highlightImages,
     minimumOrder,
     advanceNotice,
     contactMessage
@@ -39,29 +46,34 @@ async function getCateringData() {
   return { categories, info };
 }
 
-// Make this an async component
 export default async function CateringPage() {
-  // Actually fetch and use the data
   const { categories, info } = await getCateringData();
-  console.log("Categories:", categories);
-  console.log("Items in first category:", categories[0]?.items);
+  const sweets = categories?.find(
+    (c) => c.title?.toLowerCase() === "sweets"
+  );
+  const appetizers = categories?.find(
+    (c) => c.title?.toLowerCase() === "appetizers"
+  );
+
+  // Use only curated highlight images from Sanity to avoid duplication
+  const galleryImages = (info?.highlightImages || []).slice(0, 8);
   return (
     <main>
       {/* Hero Section */}
       <section className="relative bg-stone-50 py-20">
-        {info?.heroImage && (
-          <div className="absolute inset-0">
-            <Image
-              src="/images/white-cake.jpg"
-              alt="Catering background"
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority
-            />
-          <div className="absolute inset-0 bg-white/30"></div>
-          </div>
-        )}
+        <div className="absolute inset-0">
+          <Image
+            src={info?.heroImage
+              ? urlForImage(info.heroImage).width(1920).height(700).fit("crop").url()
+              : "/images/catering-hero.jpg"}
+            alt="Catering background"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-white/30" />
+        </div>
         <div className="container text-center relative z-10">
           <h1 className="text-5xl font-serif font-light mb-6 text-stone-900">
             {info?.title || "Catering Services"}
@@ -73,151 +85,157 @@ export default async function CateringPage() {
         </div>
       </section>
 
-      {/* Dynamic Categories from Sanity */}
-      <section className="container py-20">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-serif font-light mb-6 text-stone-900">
-            Our Catering Menu
-          </h2>
-          <p className="text-lg text-stone-600 mb-8">
-            We offer a variety of delicious options for your events
-          </p>
-        </div>
-
-        {/* Display categories from Sanity */}
-        {categories && categories.length > 0 ? (
-          <div className="space-y-20">
-            {categories.map((category) => (
-              <div key={category._id}>
-                {/* Category Header */}
-                <div className="text-center mb-12">
-                  {category.icon && (
-                    <div className="text-6xl mb-4">{category.icon}</div>
-                  )}
-                  <h3 className="text-3xl font-serif font-light text-stone-900 mb-4">
-                    {category.title}
-                  </h3>
-                  {category.description && (
-                    <p className="text-lg text-stone-600 max-w-2xl mx-auto">
-                      {category.description}
-                    </p>
-                  )}
-                </div>
-
-                {/* Category Image (if exists) */}
-                {category.image && (
-                  <div className="mb-12 max-w-4xl mx-auto">
-                    <div className="aspect-video relative rounded-2xl overflow-hidden h-64">
-                      <Image
-                        src={urlForImage(category.image)
-                          .width(800)
-                          .height(450)
-                          .fit("crop")
-                          .url()}
-                        alt={category.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 1200px) 100vw, 800px"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Category Items */}
-                {category.items && category.items.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {category.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden hover:shadow-md transition-shadow"
-                      >
-                        {item.image && (
-                          <div className="aspect-square relative relative overflow-hidden">
-                            <Image
-                              src={urlForImage(item.image)
-                                .width(400)
-                                .height(400)
-                                .fit("crop")
-                                .url()}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            />
-                          </div>
-                        )}
-                        <div className="p-6">
-                          <h4 className="text-xl font-semibold text-stone-900 mb-2">
-                            {item.name}
-                          </h4>
-                          {item.description && (
-                            <p className="text-stone-600 mb-4 text-sm">
-                              {item.description}
-                            </p>
-                          )}
-                          {item.price && (
-                            <div className="text-lg font-semibold text-amber-600">
-                              {item.price}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-stone-500">
-                      No items available in this category yet.
-                    </p>
-                    <p className="text-sm text-stone-400 mt-2">
-                      Add items in Sanity Studio to display them here.
-                    </p>
-                  </div>
-                )}
+      {/* Curated Highlights (optional) */}
+      {galleryImages.length > 0 && (
+        <section className="container py-10">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-serif font-light text-stone-900">
+              {info?.highlightTitle || 'A Taste Of Our Menu'}
+            </h2>
+            { (info?.highlightSubtitle || '').length > 0 && (
+              <p className="text-stone-600">{info?.highlightSubtitle}</p>
+            )}
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {galleryImages.map((img, idx) => (
+              <div key={idx} className="relative aspect-square overflow-hidden rounded-2xl border border-stone-200">
+                <Image
+                  src={urlForImage(img).width(600).height(600).fit("crop").url()}
+                  alt="Catering item"
+                  fill
+                  className="object-cover hover:scale-105 transition-transform"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 25vw"
+                />
               </div>
             ))}
           </div>
-        ) : (
-          // Fallback to your static categories if no Sanity data
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Your existing static categories as fallback */}
+        </section>
+      )}
+
+      {/* Dynamic Categories from Sanity */}
+      <section className="container py-16">
+        {/* Quick anchor nav for sections */}
+        <div className="flex justify-center gap-3 mb-8">
+          <a href="#sweets" className="px-4 py-2 rounded-full border border-stone-300 text-stone-700 hover:bg-stone-100">Sweets</a>
+          <a href="#appetizers" className="px-4 py-2 rounded-full border border-stone-300 text-stone-700 hover:bg-stone-100">Appetizers</a>
+        </div>
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-serif font-light text-stone-900">
+            Our Catering Menu
+          </h2>
+          <p className="text-lg text-stone-600">
+            Sweet treats and savory bites for every occasion
+          </p>
+        </div>
+
+        {/* Sweets Section */}
+        <div id="sweets" className="mb-16 scroll-mt-24">
+          <div className="mb-6 text-center">
+            <h3 className="text-3xl font-serif font-light text-stone-900 flex items-center justify-center gap-3">
+              <span>{sweets?.icon || "🧁"}</span>
+              Sweets
+            </h3>
+            {sweets?.description && (
+              <p className="text-stone-600 mt-2 max-w-2xl mx-auto">
+                {sweets.description}
+              </p>
+            )}
+          </div>
+
+          {sweets?.items?.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {sweets.items.map((item, idx) => (
+                <div key={idx} className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden hover:shadow-md transition-shadow">
+                  {item.image && (
+                    <div className="relative aspect-square overflow-hidden">
+                      <Image
+                        src={urlForImage(item.image).width(600).height(600).fit("crop").url()}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <h4 className="text-lg font-semibold text-stone-900">{item.name}</h4>
+                      {item.price && (
+                        <span className="text-amber-700 font-semibold whitespace-nowrap">{item.price}</span>
+                      )}
+                    </div>
+                    {item.description && (
+                      <p className="text-sm text-stone-600 mt-2 line-clamp-3">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-stone-500 text-center py-8">Add sweets in Sanity to see them here.</div>
+          )}
+        </div>
+
+        {/* Appetizers Section */}
+        <div id="appetizers" className="mt-20 scroll-mt-24">
+          <div className="mb-6 text-center">
+            <h3 className="text-3xl font-serif font-light text-stone-900 flex items-center justify-center gap-3">
+              <span>{appetizers?.icon || "🥟"}</span>
+              Appetizers
+            </h3>
+            {appetizers?.description && (
+              <p className="text-stone-600 mt-2 max-w-2xl mx-auto">
+                {appetizers.description}
+              </p>
+            )}
+          </div>
+
+          {appetizers?.items?.length ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {appetizers.items.map((item, idx) => (
+                <div key={idx} className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden hover:shadow-md transition-shadow">
+                  {item.image && (
+                    <div className="relative aspect-square overflow-hidden">
+                      <Image
+                        src={urlForImage(item.image).width(600).height(600).fit("crop").url()}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <h4 className="text-lg font-semibold text-stone-900">{item.name}</h4>
+                      {item.price && (
+                        <span className="text-amber-700 font-semibold whitespace-nowrap">{item.price}</span>
+                      )}
+                    </div>
+                    {item.description && (
+                      <p className="text-sm text-stone-600 mt-2 line-clamp-3">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-stone-500 text-center py-8">Add appetizers in Sanity to see them here.</div>
+          )}
+        </div>
+
+        {/* Fallback when no categories exist at all */}
+        {!categories?.length && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-10">
             <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center">
               <div className="text-6xl mb-6">🧁</div>
-              <h3 className="text-2xl font-serif font-light text-stone-900 mb-4">
-                Sweets
-              </h3>
-              <p className="text-stone-600 mb-6">
-                Delicious desserts and sweet treats for your special occasions
-              </p>
-              <p className="text-sm text-stone-400">
-                Add categories in Sanity Studio to see your custom menu here.
-              </p>
+              <h3 className="text-2xl font-serif font-light text-stone-900 mb-4">Sweets</h3>
+              <p className="text-stone-600">Delicious desserts and sweet treats.</p>
             </div>
-
             <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center">
               <div className="text-6xl mb-6">🥟</div>
-              <h3 className="text-2xl font-serif font-light text-stone-900 mb-4">
-                Appetizers
-              </h3>
-              <p className="text-stone-600 mb-6">
-                Savory bites and appetizers to start your event perfectly
-              </p>
-              <p className="text-sm text-stone-400">
-                Add categories in Sanity Studio to see your custom menu here.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center">
-              <div className="text-6xl mb-6">🥗</div>
-              <h3 className="text-2xl font-serif font-light text-stone-900 mb-4">
-                Salads
-              </h3>
-              <p className="text-stone-600 mb-6">
-                Fresh and healthy salad options for balanced catering
-              </p>
-              <p className="text-sm text-stone-400">
-                Add categories in Sanity Studio to see your custom menu here.
-              </p>
+              <h3 className="text-2xl font-serif font-light text-stone-900 mb-4">Appetizers</h3>
+              <p className="text-stone-600">Savory bites to start your event.</p>
             </div>
           </div>
         )}
@@ -227,9 +245,7 @@ export default async function CateringPage() {
       <section className="bg-stone-50 py-20">
         <div className="container">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-serif font-light text-center mb-12 text-stone-900">
-              Catering Packages
-            </h2>
+            <h2 className="text-3xl font-serif font-light text-center mb-12 text-stone-900">Catering Packages</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
               <div className="bg-white p-8 rounded-xl shadow-sm text-center">
@@ -295,7 +311,7 @@ export default async function CateringPage() {
                   Get Custom Quote
                 </Link>
                 <a
-                  href="https://wa.me/1234567890?text=Hi! I'm interested in catering services for my event."
+                  href="https://wa.me/17138203443?text=Hi! I'm interested in catering services for my event."
                   target="_blank"
                   className="bg-green-500 text-white px-8 py-4 rounded-full font-medium hover:bg-green-600 transition-colors"
                 >

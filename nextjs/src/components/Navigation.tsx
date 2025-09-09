@@ -10,12 +10,12 @@ export default function Navigation() {
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const productCategories = [
-    { href: '/gallery', label: 'All Cakes', icon: '🎂' },
-    { href: '/gallery?category=wedding', label: 'Wedding Cakes', icon: '💒' },
-    { href: '/gallery?category=birthday', label: 'Birthday Cakes', icon: '🎉' },
-    { href: '/gallery?category=engagement', label: 'Engagement Cakes', icon: '💍' },
+    { href: { pathname: '/gallery' }, label: 'All Cakes', icon: '🎂' },
+    { href: { pathname: '/gallery', query: { category: 'wedding' } }, label: 'Wedding Cakes', icon: '💒' },
+    { href: { pathname: '/gallery', query: { category: 'birthday' } }, label: 'Birthday Cakes', icon: '🎉' },
+    { href: { pathname: '/gallery', query: { category: 'engagement' } }, label: 'Engagement Cakes', icon: '💍' },
     { href: '/products/catering', label: 'Catering Services', icon: '🍽️' },
-  ]
+  ] as const
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function Navigation() {
                     : 'text-stone-700'
                 }`}
               >
-                Our Cakes
+                Bakes & More
                 <svg 
                   className={`w-4 h-4 ml-1 transition-transform duration-200 ${
                     isProductsOpen ? 'rotate-180' : ''
@@ -82,7 +82,7 @@ export default function Navigation() {
                 <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-stone-200 rounded-lg shadow-lg py-3 z-50">
                   {productCategories.map((item) => (
                     <Link
-                      key={item.href}
+                      key={typeof item.href === 'string' ? item.href : `${item.href.pathname}?${new URLSearchParams((item.href as any).query || {}).toString()}`}
                       href={item.href}
                       onClick={handleLinkClick}
                       className="flex items-center px-6 py-3 text-stone-700 hover:bg-stone-50 hover:text-amber-600 transition-colors"
@@ -120,7 +120,7 @@ export default function Navigation() {
             
             {/* Call to Action */}
             <a
-              href="tel:+1234567890"
+              href="tel:+17138203443"
               className="bg-stone-900 text-white px-6 py-2 rounded-full font-medium hover:bg-amber-600 transition-colors"
             >
               📞 Order Now

@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  unoptimized: true, // Disable image optimization
   images: {
     unoptimized: true, // Disable image optimization
     remotePatterns: [
